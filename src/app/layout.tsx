@@ -24,12 +24,15 @@ export default function RootLayout({
         <ThemeProvider>
           <SidebarProvider>
             {isCalendarPage ? (
-              // Calendar page gets full-width layout without sidebar
-              <div className="h-screen">
-                {children}
+              // Calendar page gets full-width layout
+              <div className="h-screen flex flex-col">
+                <Header />
+                <main className="flex-1 overflow-auto">
+                  {children}
+                </main>
               </div>
             ) : (
-              // Other pages use the standard layout with sidebar
+              // Standard layout with sidebar for other pages
               <div className="flex h-screen">
                 <Sidebar />
                 <div className="flex-1 flex flex-col overflow-hidden">

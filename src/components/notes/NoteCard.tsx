@@ -27,6 +27,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
   const [editContent, setEditContent] = useState(note.content);
   const [showLabelInput, setShowLabelInput] = useState(false);
   const [newLabel, setNewLabel] = useState('');
+  const [selectedColor, setSelectedColor] = useState(note.color);
 
   const handleUpdate = () => {
     if (editTitle.trim() || editContent.trim()) {
@@ -34,6 +35,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
         ...note,
         title: editTitle.trim(),
         content: editContent.trim(),
+        color: selectedColor
       });
       setIsEditing(false);
     }
@@ -49,27 +51,24 @@ export const NoteCard: React.FC<NoteCardProps> = ({
     }
   };
 
-  // Apply dark mode styling to existing color classes
-  const getColorClass = () => {
-    if (theme === 'dark') {
-      if (note.color.includes('red')) return 'bg-red-900';
-      if (note.color.includes('yellow')) return 'bg-yellow-900';
-      if (note.color.includes('green')) return 'bg-green-900';
-      if (note.color.includes('blue')) return 'bg-blue-900';
-      if (note.color.includes('purple')) return 'bg-purple-900';
-      return 'bg-gray-800 border border-gray-700';
-    }
-    return note.color || 'bg-white';
-  };
+  // Available note colors
+  const noteColors = [
+    { value: 'bg-white dark:bg-gray-800', label: 'Default' },
+    { value: 'bg-red-100 dark:bg-red-900', label: 'Red' },
+    { value: 'bg-yellow-100 dark:bg-yellow-900', label: 'Yellow' },
+    { value: 'bg-green-100 dark:bg-green-900', label: 'Green' },
+    { value: 'bg-blue-100 dark:bg-blue-900', label: 'Blue' },
+    { value: 'bg-purple-100 dark:bg-purple-900', label: 'Purple' },
+  ];
 
+  // Shadow and text classes based on theme
   const shadowClass = theme === 'dark' ? 'shadow-lg shadow-black/20' : 'shadow-md';
   const textClass = theme === 'dark' ? 'text-white' : 'text-gray-900';
   const secondaryTextClass = theme === 'dark' ? 'text-gray-300' : 'text-gray-700';
-  const toolbarBgClass = theme === 'dark' ? 'bg-gray-800/80' : 'bg-gray-50';
   const borderClass = theme === 'dark' && note.color === 'bg-white' ? 'border border-gray-700' : '';
 
   return (
-    <div className={`${getColorClass()} ${shadowClass} ${borderClass} rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg`}>
+    <div className={`${note.color} ${shadowClass} ${borderClass} rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg`}>
       {isEditing ? (
         <div className="p-4">
           <input
@@ -77,15 +76,35 @@ export const NoteCard: React.FC<NoteCardProps> = ({
             placeholder="Title"
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
-            className={`w-full p-2 mb-2 bg-transparent outline-none font-medium ${textClass}`}
+            className={`w-full p-2 mb-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md outline-none font-medium ${textClass} focus:ring-2 focus:ring-indigo-500`}
           />
           <textarea
             placeholder="Take a note..."
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            className={`w-full p-2 bg-transparent outline-none resize-none ${textClass}`}
+            className={`w-full p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md outline-none resize-none ${textClass} focus:ring-2 focus:ring-indigo-500`}
             rows={6}
           />
+          
+          {/* Color selector */}
+          <div className="mt-3 mb-4">
+            <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Note color</label>
+            <div className="flex space-x-2">
+              {noteColors.map((color) => (
+                <button
+                  key={color.value}
+                  className={`w-6 h-6 rounded-full ${color.value} ${
+                    selectedColor === color.value 
+                      ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-gray-800' 
+                      : 'border border-gray-300 dark:border-gray-600'
+                  }`}
+                  onClick={() => setSelectedColor(color.value)}
+                  aria-label={`Set note color to ${color.label}`}
+                />
+              ))}
+            </div>
+          </div>
+          
           <div className="flex justify-end mt-3">
             <button
               className={`px-3 py-1.5 rounded-md text-sm mr-2 ${
@@ -128,6 +147,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                     <button
                       className="ml-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                       onClick={() => onRemoveLabel(label)}
+                      aria-label={`Remove ${label} label`}
                     >
                       ×
                     </button>
@@ -137,7 +157,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
             )}
           </div>
 
-          <div className={`border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} ${toolbarBgClass} px-4 py-2 flex justify-between`}>
+          <div className={`border-t ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} ${theme === 'dark' ? 'bg-gray-800/50' : 'bg-gray-50'} px-4 py-2 flex justify-between`}>
             <div className="flex space-x-3">
               <button
                 className={`p-1.5 rounded-full ${theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-200'}`}
@@ -198,9 +218,9 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                   </svg>
                 </button>
                 {showLabelInput && (
-                  <div className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg ${
-                    theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white'
-                  } z-10`}>
+                  <div className={`absolute z-10 right-0 mt-2 w-48 rounded-md shadow-lg ${
+                    theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+                  }`}>
                     <div className="p-2">
                       <input
                         type="text"
@@ -211,7 +231,7 @@ export const NoteCard: React.FC<NoteCardProps> = ({
                           theme === 'dark'
                             ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                             : 'border-gray-300 text-gray-900 placeholder-gray-500'
-                        }`}
+                        } focus:outline-none focus:ring-2 focus:ring-indigo-500`}
                       />
                       <div className="flex justify-end mt-2">
                         <button

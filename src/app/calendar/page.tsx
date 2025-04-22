@@ -1,39 +1,25 @@
 'use client'
 
-// src/app/calendar/page.tsx
 import React, { useState } from 'react';
-import {  addDays, subDays, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
+import { addDays, subDays, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import { useTheme } from '@/context/ThemeContext';
 import CreateEventModal from '@/components/calendar/CreateEventModal';
 import EventDetailsModal from '@/components/calendar/EventDetailsModal';
-import CalendarHeader from '@/components/calendar/CalendarHeader';
-import CalendarGrid from '@/components/calendar/CalendarGrid';
-
-type Event = {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  category: 'productivity' | 'hobby' | 'personal';
-  color?: string;
-  description?: string;
-  location?: string;
-  tags?: string[];
-  isCompleted?: boolean;
-};
+import { CalendarAdapter, PageEvent } from '@/components/calendar/CalendarAdapter';
+import { CalendarView } from '@/types/types'; // Make sure this is imported correctly
 
 export default function CalendarPage() {
   const { theme } = useTheme();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState<'day' | 'week' | 'month' | '3d'>('day');
+  const [viewMode, setViewMode] = useState<CalendarView>('day');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<PageEvent | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  // Sample events data
-  const [events, setEvents] = useState<Event[]>([
+  // Sample events data - this is your Event[] type used in the page
+  const [events, setEvents] = useState<PageEvent[]>([
     {
       id: '1',
       title: 'Meeting with team',
@@ -143,7 +129,6 @@ export default function CalendarPage() {
         setCurrentDate(addDays(currentDate, 7));
         break;
       case 'month':
-        // For simplicity we'll just add 30 days here
         setCurrentDate(addDays(currentDate, 30));
         break;
     }
@@ -161,25 +146,24 @@ export default function CalendarPage() {
         setCurrentDate(subDays(currentDate, 7));
         break;
       case 'month':
-        // For simplicity we'll just subtract 30 days here
         setCurrentDate(subDays(currentDate, 30));
         break;
     }
   };
 
   // Event handling functions
-  const handleEventClick = (event: Event) => {
+  const handleEventClick = (event: PageEvent) => {
     setSelectedEvent(event);
     setShowDetailsModal(true);
   };
 
-  const handleCreateEvent = (newEvent: Omit<Event, 'id'>) => {
+  const handleCreateEvent = (newEvent: Omit<PageEvent, 'id'>) => {
     const id = Math.random().toString(36).substring(2, 9);
     setEvents([...events, { ...newEvent, id }]);
     setShowCreateModal(false);
   };
 
-  const handleUpdateEvent = (updatedEvent: Event) => {
+  const handleUpdateEvent = (updatedEvent: PageEvent) => {
     setEvents(events.map(event => 
       event.id === updatedEvent.id ? updatedEvent : event
     ));
@@ -223,29 +207,21 @@ export default function CalendarPage() {
     }
   };
 
-  // Get events for a specific date
-
-
   // Dynamic classes based on theme
   const bgClass = theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50';
+  const buttonClass = theme === 'dark' 
+    ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
+    : 'text-gray-700 hover:bg-gray-100';
+  const activeButtonClass = theme === 'dark'
+    ? 'bg-indigo-600 text-white'
+    : 'bg-indigo-600 text-white';
+  const headerTextClass = theme === 'dark' ? 'text-white' : 'text-gray-900';
 
   return (
     <div className={`min-h-screen ${bgClass} transition-colors duration-300`}>
       <main className="container mx-auto px-4 py-6">
-        <CalendarHeader 
-          currentDate={currentDate}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          onPrevious={goToPreviousPeriod}
-          onNext={goToNextPeriod}
-          onToday={goToToday}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          onCreateEvent={() => setShowCreateModal(true)}
-        />
-
+        {/* Category filters */}
         <div className="mt-6 mb-6 flex flex-wrap items-center justify-between">
-          {/* Category filters */}
           <div className="flex flex-wrap items-center gap-2 mb-4 md:mb-0">
             <span className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
               Filter by:
@@ -302,58 +278,22 @@ export default function CalendarPage() {
               Personal
             </button>
           </div>
-
-          {/* View switcher for smaller screens */}
-          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('day')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                viewMode === 'day'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              D
-            </button>
-            <button
-              onClick={() => setViewMode('3d')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                viewMode === '3d'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              3D
-            </button>
-            <button
-              onClick={() => setViewMode('week')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                viewMode === 'week'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              W
-            </button>
-            <button
-              onClick={() => setViewMode('month')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                viewMode === 'month'
-                  ? 'bg-indigo-600 text-white'
-                  : 'text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              M
-            </button>
-          </div>
         </div>
 
-        <CalendarGrid 
-          dates={getDatesToDisplay()}
-          events={filteredEvents}
-          viewMode={viewMode}
-          onEventClick={handleEventClick}
+        {/* Use the adapter component instead of direct components */}
+        <CalendarAdapter
           currentDate={currentDate}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          events={filteredEvents}
+          onEventClick={handleEventClick}
+          onPrevious={goToPreviousPeriod}
+          onNext={goToNextPeriod}
+          onToday={goToToday}
+          onCreateEvent={() => setShowCreateModal(true)}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          dates={getDatesToDisplay()}
         />
 
         {/* Create Event Modal */}

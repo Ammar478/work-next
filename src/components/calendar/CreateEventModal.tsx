@@ -78,205 +78,269 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     setTags([]);
   };
   
-  // Dynamic classes based on theme
-  const bgClass = theme === 'dark' ? 'bg-gray-800' : 'bg-white';
-  const textClass = theme === 'dark' ? 'text-white' : 'text-gray-900';
-  const borderClass = theme === 'dark' ? 'border-gray-700' : 'border-gray-300';
-  const inputBgClass = theme === 'dark' ? 'bg-gray-700' : 'bg-white';
+  // Get category color and class
+  const getCategoryClasses = (cat: string) => {
+    switch (cat) {
+      case 'productivity':
+        return theme === 'dark' 
+          ? 'bg-purple-900 bg-opacity-50 text-purple-100 border-purple-500' 
+          : 'bg-purple-100 text-purple-800 border-purple-500';
+      case 'hobby':
+        return theme === 'dark'
+          ? 'bg-blue-900 bg-opacity-50 text-blue-100 border-blue-500'
+          : 'bg-blue-100 text-blue-800 border-blue-500';
+      case 'personal':
+        return theme === 'dark'
+          ? 'bg-pink-900 bg-opacity-50 text-pink-100 border-pink-500'
+          : 'bg-pink-100 text-pink-800 border-pink-500';
+      default:
+        return theme === 'dark'
+          ? 'bg-gray-700 text-gray-200 border-gray-600'
+          : 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
   
   if (!isOpen) return null;
   
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 text-center">
-        <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose}></div>
-        
-        <div className={`relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform ${bgClass} ${textClass} shadow-xl rounded-2xl`}>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium leading-6">Add New Event</h3>
-            <button 
-              className="rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              onClick={onClose}
-            >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+        <div 
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
+          onClick={onClose}
+          aria-hidden="true"
+        ></div>
+
+        {/* Modal panel */}
+        <div className="inline-block align-middle bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg w-full">
+          <div className="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div className="sm:flex sm:items-start">
+              <div className="mt-3 sm:mt-0 sm:ml-4 sm:text-left w-full">
+                <div className="flex justify-between items-center mb-5">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
+                    Create New Event
+                  </h3>
+                  <button
+                    type="button"
+                    className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    onClick={onClose}
+                  >
+                    <span className="sr-only">Close</span>
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Event Title */}
+                  <div>
+                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Event Title *
+                    </label>
+                    <input
+                      type="text"
+                      id="title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Add title"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      required
+                    />
+                  </div>
+                  
+                  {/* Category Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Category
+                    </label>
+                    <div className="grid grid-cols-3 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setCategory('productivity')}
+                        className={`py-2 px-3 rounded-md flex items-center justify-center text-sm font-medium border ${
+                          category === 'productivity' 
+                            ? getCategoryClasses('productivity') 
+                            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-purple-500 mr-2"></span>
+                        Productivity
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCategory('hobby')}
+                        className={`py-2 px-3 rounded-md flex items-center justify-center text-sm font-medium border ${
+                          category === 'hobby' 
+                            ? getCategoryClasses('hobby') 
+                            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
+                        Hobby
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCategory('personal')}
+                        className={`py-2 px-3 rounded-md flex items-center justify-center text-sm font-medium border ${
+                          category === 'personal' 
+                            ? getCategoryClasses('personal') 
+                            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-pink-500 mr-2"></span>
+                        Personal
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Date & Time */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Start Date & Time
+                      </label>
+                      <div className="flex space-x-2">
+                        <input
+                          type="date"
+                          id="start-date"
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                        <input
+                          type="time"
+                          value={startTime}
+                          onChange={(e) => setStartTime(e.target.value)}
+                          className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        End Date & Time
+                      </label>
+                      <div className="flex space-x-2">
+                        <input
+                          type="date"
+                          id="end-date"
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                        <input
+                          type="time"
+                          value={endTime}
+                          onChange={(e) => setEndTime(e.target.value)}
+                          className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Location */}
+                  <div>
+                    <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Location (optional)
+                    </label>
+                    <input
+                      type="text"
+                      id="location"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder="Add location"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  
+                  {/* Description */}
+                  <div>
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Description (optional)
+                    </label>
+                    <textarea
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Add description"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  
+                  {/* Tags */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Tags (optional)
+                    </label>
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        placeholder="Add tag and press Enter"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddTag();
+                          }
+                        }}
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddTag}
+                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    
+                    {tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                          >
+                            {tag}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveTag(tag)}
+                              className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                            >
+                              <span className="sr-only">Remove tag</span>
+                              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
-          <div className="space-y-4">
-            {/* Event title */}
-            <div>
-              <input
-                type="text"
-                placeholder="Event title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className={`w-full px-3 py-2 rounded-md border ${borderClass} ${inputBgClass} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-              />
-            </div>
-            
-            {/* Category selector */}
-            <div className="flex space-x-2">
-              <button
-                className={`flex-1 py-2 rounded-md text-center ${
-                  category === 'productivity' 
-                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' 
-                    : `border ${borderClass} text-gray-700 dark:text-gray-300`
-                }`}
-                onClick={() => setCategory('productivity')}
-              >
-                <span className="inline-block w-2 h-2 rounded-full bg-purple-500 mr-1"></span>
-                Productivity
-              </button>
-              <button
-                className={`flex-1 py-2 rounded-md text-center ${
-                  category === 'hobby' 
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
-                    : `border ${borderClass} text-gray-700 dark:text-gray-300`
-                }`}
-                onClick={() => setCategory('hobby')}
-              >
-                <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span>
-                Hobby
-              </button>
-              <button
-                className={`flex-1 py-2 rounded-md text-center ${
-                  category === 'personal' 
-                    ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' 
-                    : `border ${borderClass} text-gray-700 dark:text-gray-300`
-                }`}
-                onClick={() => setCategory('personal')}
-              >
-                <span className="inline-block w-2 h-2 rounded-full bg-pink-500 mr-1"></span>
-                Personal
-              </button>
-            </div>
-            
-            {/* Date & Time */}
-            <div>
-              <label className="block text-sm font-medium mb-1">Start</label>
-              <div className="flex space-x-2">
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className={`flex-1 px-3 py-2 rounded-md border ${borderClass} ${inputBgClass} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-                />
-                <input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className={`w-24 px-3 py-2 rounded-md border ${borderClass} ${inputBgClass} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">End</label>
-              <div className="flex space-x-2">
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className={`flex-1 px-3 py-2 rounded-md border ${borderClass} ${inputBgClass} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-                />
-                <input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className={`w-24 px-3 py-2 rounded-md border ${borderClass} ${inputBgClass} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-                />
-              </div>
-            </div>
-            
-            {/* Location */}
-            <div>
-              <input
-                type="text"
-                placeholder="Location (optional)"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className={`w-full px-3 py-2 rounded-md border ${borderClass} ${inputBgClass} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-              />
-            </div>
-            
-            {/* Description */}
-            <div>
-              <textarea
-                placeholder="Description (optional)"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                className={`w-full px-3 py-2 rounded-md border ${borderClass} ${inputBgClass} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-              />
-            </div>
-            
-            {/* Tags */}
-            <div>
-              <label className="block text-sm font-medium mb-1">Tags</label>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  placeholder="Add tag and press Enter"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddTag();
-                    }
-                  }}
-                  className={`flex-1 px-3 py-2 rounded-md border ${borderClass} ${inputBgClass} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
-                />
-                <button
-                  onClick={handleAddTag}
-                  className="px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
-                >
-                  Add
-                </button>
-              </div>
-              
-              {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className={`px-2 py-1 rounded-full text-xs font-medium flex items-center ${
-                        theme === 'dark' ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {tag}
-                      <button
-                        onClick={() => handleRemoveTag(tag)}
-                        className="ml-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            {/* Actions */}
-            <div className="flex justify-end space-x-2 mt-6">
-              <button
-                onClick={onClose}
-                className={`px-4 py-2 rounded-md border ${borderClass} ${
-                  theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
-                disabled={!title.trim()}
-              >
-                Save
-              </button>
-            </div>
+          <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={!title.trim()}
+              className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm ${!title.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              Create Event
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>

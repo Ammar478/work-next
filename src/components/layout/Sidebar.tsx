@@ -13,8 +13,17 @@ const Sidebar = () => {
   
   const navItems = [
     {
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      ),
+    },
+    {
       name: 'Calendar',
-      href: '/',
+      href: '/calendar',
       icon: (
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -57,11 +66,11 @@ const Sidebar = () => {
     : 'bg-white text-gray-900 border-r border-gray-200'
   
   const sidebarLinkClass = (active: boolean) => {
-    const baseClass = 'flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-150'
+    const baseClass = 'flex items-center px-4 py-3 text-sm rounded-lg transition-colors duration-150'
     
     if (active) {
       return theme === 'dark'
-        ? `${baseClass} bg-indigo-600 text-white`
+        ? `${baseClass} bg-indigo-900 bg-opacity-50 text-white`
         : `${baseClass} bg-indigo-50 text-indigo-700`
     }
     
@@ -74,40 +83,49 @@ const Sidebar = () => {
     <aside 
       className={`${sidebarBgClass} ${isOpen ? 'w-64' : 'w-20'} transition-all duration-300 ease-in-out flex flex-col`}
     >
-      <div className="p-4 flex items-center justify-between">
+      <div className="p-5 flex items-center justify-center md:justify-start">
         {isOpen ? (
-          <div className="text-xl font-bold">WorkApp</div>
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold">
+              W
+            </div>
+            <div className="ml-3 text-xl font-bold">WorkApp</div>
+          </div>
         ) : (
-          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
+          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold">
             W
           </div>
         )}
       </div>
       
-      <nav className="flex-1 pt-4">
-        <ul className="px-2 space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || 
-              (item.href !== '/' && pathname?.startsWith(item.href))
-            
-            return (
-              <li key={item.name}>
-                <Link href={item.href} className={sidebarLinkClass(isActive)}>
-                  <span className="mr-3">{item.icon}</span>
-                  {isOpen && <span>{item.name}</span>}
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
+      <nav className="flex-1 pt-5 px-3 space-y-1">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href || 
+            (item.href !== '/dashboard' && pathname?.startsWith(item.href))
+          
+          return (
+            <Link 
+              key={item.name}
+              href={item.href}
+              className={sidebarLinkClass(isActive)}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              <span className="flex items-center justify-center">
+                {item.icon}
+              </span>
+              {isOpen && <span className="ml-3">{item.name}</span>}
+            </Link>
+          )
+        })}
       </nav>
       
       <div className="p-4">
-        <Link 
-          href="/profile" 
-          className={`flex items-center ${theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}
+        <div
+          className={`flex items-center p-3 rounded-lg ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
+          }`}
         >
-          <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white">
+          <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white">
             U
           </div>
           {isOpen && (
@@ -116,7 +134,7 @@ const Sidebar = () => {
               <p className="text-xs opacity-75">user@example.com</p>
             </div>
           )}
-        </Link>
+        </div>
       </div>
     </aside>
   )
